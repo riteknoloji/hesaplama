@@ -3,6 +3,10 @@
   color: #333;
   text-align: center;
   margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 10px;
 }
 
 body {
@@ -11,6 +15,7 @@ body {
 
 h1 {
   color: #0066cc;
+  font-size: 24px;
 }
 
 #calculator {
@@ -110,19 +115,105 @@ button {
   width: 90%;
   max-width: 700px;
   margin: 20px auto;
+  overflow-x: auto;
 }
 
 .history-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .history-table th,
 .history-table td {
   border: 1px solid #ddd;
   padding: 8px;
+  white-space: nowrap;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 14px;
 }
 
 .history-table th {
   background-color: #f2f2f2;
 }
+
+.history-table tbody tr:nth-child(odd) { background-color: #ffffff; }
+.history-table tbody tr:nth-child(even) { background-color: #f2f2f2; }
+
+.col-number { width: 160px; }
+.col-pctdays { width: 160px; }
+.col-result { width: 200px; }
+.col-datetime { width: 160px; }
+.col-actions { width: 100px; }
+
+.db-status {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.pagination {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.pagination button {
+  width: auto;
+  padding: 6px 12px;
+}
+
+.pagination select {
+  padding: 6px;
+}
+
+.btn-delete {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  #calculator, #calculator2 { width: 95%; max-width: none; }
+  #history { width: 95%; }
+  .history-table th, .history-table td { font-size: 13px; padding: 6px; }
+  .col-number { width: 140px; }
+  .col-pctdays { width: 150px; }
+  .col-result { width: 180px; }
+  .col-datetime { width: 150px; }
+  .col-actions { width: 90px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 20px; }
+  #calculator, #calculator2 { width: 100%; }
+  #calcButtons { gap: 4px; }
+  #calcButtons button, #clearOne { font-size: 16px; padding: 10px; min-height: 44px; }
+  #calcInput { font-size: 16px; }
+  .history-table th, .history-table td { font-size: 12px; padding: 5px; }
+  .col-number { width: 130px; }
+  .col-pctdays { width: 140px; }
+  .col-result { width: 170px; }
+  .col-datetime { width: 140px; }
+  .col-actions { width: 80px; }
+}
+
+@media (max-width: 360px) {
+  h1 { font-size: 18px; }
+  input[type="text"] { font-size: 16px; }
+  #calcButtons button { font-size: 15px; padding: 9px; min-height: 42px; }
+  .history-table th, .history-table td { font-size: 11px; padding: 4px; }
+  .col-number { width: 120px; }
+  .col-pctdays { width: 130px; }
+  .col-result { width: 160px; }
+  .col-datetime { width: 130px; }
+  .col-actions { width: 75px; }
+}
+
+button, .btn-delete { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }

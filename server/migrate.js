@@ -18,6 +18,7 @@ async function migrate() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`
   )
+  await pool.query('ALTER TABLE calculations ADD COLUMN IF NOT EXISTS result NUMERIC')
   await pool.query('CREATE INDEX IF NOT EXISTS idx_calculations_created_at ON calculations(created_at DESC)')
 }
 
