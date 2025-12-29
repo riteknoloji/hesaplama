@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { StepperInput } from "@/components/StepperInput";
 import { ResultCard } from "@/components/ResultCard";
+import { CurrencyRatesTab } from "@/components/CurrencyRatesTab";
 import { Calculator, Coins, TrendingUp, History } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCreateCalculation } from "@/hooks/use-calculations";
@@ -200,15 +201,9 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4 }}
             >
-              <Card className="border-none shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl min-h-[400px] flex items-center justify-center">
-                <CardContent className="text-center p-8">
-                  <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
-                    <Coins className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Kur Bilgileri</h3>
-                  <p className="text-muted-foreground">
-                    Canlı döviz kurları ve piyasa verileri çok yakında burada olacak.
-                  </p>
+              <Card className="border-none shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl overflow-hidden">
+                <CardContent className="p-3 sm:p-5">
+                  <CurrencyRatesTab />
                 </CardContent>
               </Card>
             </motion.div>
