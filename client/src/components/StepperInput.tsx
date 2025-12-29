@@ -58,10 +58,10 @@ export function StepperInput({
             type="number"
             value={value}
             onChange={handleChange}
-            className="text-center text-base sm:text-xl font-display font-semibold h-10 sm:h-14 pr-8 sm:pr-12 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary rounded-xl"
+            className="text-center text-base sm:text-xl font-display font-semibold h-10 sm:h-14 pr-10 sm:pr-16 lg:pr-20 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary rounded-xl"
           />
           {suffix && (
-            <span className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none text-xs sm:text-sm whitespace-nowrap">
+            <span className="absolute right-2 sm:right-3 lg:right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none text-xs sm:text-sm lg:text-base whitespace-nowrap">
               {suffix}
             </span>
           )}
