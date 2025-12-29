@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profesyonel Hesaplama Aracı</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+            touch-action: manipulation;
+        }
+
+        #calculator {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        h1 {
+            color: #0066cc;
+            font-size: 24px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .control-wrapper {
+            display: flex;
+            position: relative;
+            align-items: stretch;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 50px 12px 15px;
+            box-sizing: border-box;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .step-controls {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            bottom: 2px;
+            display: flex;
+            flex-direction: column;
+            width: 40px;
+            background: #f9fafb;
+            border-left: 1px solid #e5e7eb;
+            border-radius: 0 8px 8px 0;
+            overflow: hidden;
+        }
+
+        .step-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #4b5563;
+            transition: background 0.2s;
+            user-select: none;
+            border: none;
+            background: none;
+            touch-action: manipulation;
+        }
+
+        .step-btn:first-child {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .step-btn:hover {
+            background-color: #e5e7eb;
+            color: #0066cc;
+        }
+
+        .step-btn:active {
+            background-color: #d1d5db;
+        }
+
+        .text-box {
+            background-color: #f9fafb;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #6b7280;
+            border-left: 3px solid #0066cc;
+            min-height: 15px;
+            display: none;
+            line-height: 1.4;
+        }
+
+        #resultArea {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f3f4f6;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .total-val { color: #0066cc; }
+        .profit-val { color: #10b981; }
+
+        .result-text-box {
+            background-color: #f3f7ff;
+            border-left-color: #10b981;
+            font-weight: 500;
+            margin-top: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="calculator">
+        <h1>Hesaplama Aracı</h1>
+        
+        <form>
+            <div class="input-group">
+                <label>Başlangıç Tutarı (TL)</label>
+                <div class="control-wrapper">
+                    <input type="text" id="number" placeholder="0,00" oninput="handleInput(this)">
+                </div>
+                <div id="numberText" class="text-box"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Günlük Yüzde (%)</label>
+                <div class="control-wrapper">
+                    <input type="text" id="percentage" placeholder="0" oninput="handleInput(this)">
+                    <div class="step-controls">
+                        <button type="button" class="step-btn" onclick="stepValue('percentage', 1)">+</button>
+                        <button type="button" class="step-btn" onclick="stepValue('percentage', -1)">−</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Gün Sayısı</label>
+                <div class="control-wrapper">
+                    <input type="text" id="days" placeholder="0" oninput="handleInput(this)">
+                    <div class="step-controls">
+                        <button type="button" class="step-btn" onclick="stepValue('days', 1)">+</button>
+                        <button type="button" class="step-btn" onclick="stepValue('days', -1)">−</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultArea">
+                <div class="result-item">
+                    <div class="result-row">
+                        <span class="result-label">Genel Toplam</span>
+                        <span id="resTotal" class="result-value total-val">0,00</span>
+                    </div>
+                    <div id="resTotalText" class="text-box result-text-box"></div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-row">
+                        <span class="result-label">Toplam Kâr</span>
+                        <span id="resProfit" class="result-value profit-val">0,00</span>
+                    </div>
+                    <div id="resProfitText" class="text-box result-text-box"></div>
+                </div>
+
+                <div class="result-row" style="margin-top: 10px;">
+                    <span class="result-label">Toplam Artış Oranı</span>
+                    <span id="resPercent" class="result-value profit-val">%0</span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function stepValue(id, change) {
+            const input = document.getElementById(id);
+            let valStr = input.value.replace(/\./g, '').replace(',', '.');
+            let currentVal = parseFloat(valStr) || 0;
+            let newVal = currentVal + change;
+            
+            if (newVal < 0) newVal = 0;
+            
+            input.value = newVal.toLocaleString('tr-TR');
+            handleInput(input);
+        }
+
+        function handleInput(input) {
+            formatInput(input);
+            calculate();
+        }
+
+        function formatInput(input) {
+            if(input.id === 'number') {
+                // Sadece rakam ve bir adet virgül izni
+                let value = input.value.replace(/[^0-9,]/g, "");
+                let parts = value.split(",");
+                
+                // Binlik ayırıcıyı noktalarla ekle
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                
+                // Varsa kuruş kısmını sınırla (maks 2 hane)
+                if (parts[1]) parts[1] = parts[1].substring(0, 2);
+                
+                input.value = parts.join(",");
+                
+                // Yazı ile olan kısmı güncelle
+                const numericVal = parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
+                const el = document.getElementById('numberText');
+                if(numericVal > 0) {
+                    el.innerText = formatToTurkishWords(numericVal);
+                    el.style.display = "block";
+                } else {
+                    el.style.display = "none";
+                }
+            }
+        }
+
+        function calculate() {
+            const startNumber = parseFloat(document.getElementById('number').value.replace(/\./g, '').replace(',', '.')) || 0;
+            const dailyPercent = parseFloat(document.getElementById('percentage').value.replace(/\./g, '').replace(',', '.')) || 0;
+            const days = parseInt(document.getElementById('days').value.replace(/\./g, '').replace(',', '.')) || 0;
+
+            let finalResult = startNumber;
+
+            if (startNumber > 0 && dailyPercent > 0 && days > 0) {
+                for (let i = 0; i < days; i++) {
+                    finalResult += finalResult * (dailyPercent / 100);
+                }
+            }
+
+            const totalProfit = finalResult - startNumber;
+            const totalProfitPercent = startNumber > 0 ? (totalProfit / startNumber) * 100 : 0;
+
+            // Rakamları tr-TR formatında (Nokta binlik, Virgül kuruş) yazdır
+            document.getElementById('resTotal').innerText = finalResult.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('resProfit').innerText = totalProfit.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('resPercent').innerText = '%' + totalProfitPercent.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Yazı kısımları
+            document.getElementById('resTotalText').innerText = finalResult > 0 ? formatToTurkishWords(finalResult) : "";
+            document.getElementById('resProfitText').innerText = totalProfit > 0 ? formatToTurkishWords(totalProfit) : "";
+            
+            document.getElementById('resTotalText').style.display = finalResult > 0 ? "block" : "none";
+            document.getElementById('resProfitText').style.display = totalProfit > 0 ? "block" : "none";
+        }
+
+        function formatToTurkishWords(value) {
+            const tl = Math.floor(value);
+            const kurus = Math.round((value - tl) * 100);
+            
+            let text = numberToTurkish(tl) + " TL";
+            if(kurus > 0) {
+                text += " " + numberToTurkish(kurus) + " Kuruş";
+            }
+            return text;
+        }
+
+        function numberToTurkish(n) {
+            if (n === 0) return "Sıfır";
+            const birler = ["", "Bir", "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz", "Dokuz"];
+            const onlar = ["", "On", "Yirmi", "Otuz", "Kırk", "Elli", "Altmış", "Yetmiş", "Seksen", "Doksan"];
+            const binler = ["", "Bin", "Milyon", "Milyar", "Trilyon"];
+            
+            let sonuc = "";
+            let basamak = 0;
+
+            while (n > 0) {
+                let ucBasamak = n % 1000;
+                if (ucBasamak > 0) {
+                    let grupSes = "";
+                    let y = Math.floor(ucBasamak / 100);
+                    let o = Math.floor((ucBasamak % 100) / 10);
+                    let b = ucBasamak % 10;
+
+                    if (y > 0) {
+                        if (y > 1) grupSes += birler[y] + " ";
+                        grupSes += "Yüz ";
+                    }
+                    if (o > 0) grupSes += onlar[o] + " ";
+                    if (b > 0) {
+                        if (!(basamak === 1 && ucBasamak === 1)) {
+                            grupSes += birler[b] + " ";
+                        }
+                    }
+
+                    if (basamak === 1 && ucBasamak === 1) {
+                        sonuc = "Bin " + sonuc;
+                    } else {
+                        sonuc = grupSes + binler[basamak] + " " + sonuc;
+                    }
+                }
+                n = Math.floor(n / 1000);
+                basamak++;
+            }
+            return sonuc.trim();
+        }
+    </script>
+</body>
+</html>
