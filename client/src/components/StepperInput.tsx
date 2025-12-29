@@ -41,27 +41,27 @@ export function StepperInput({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-muted-foreground ml-1">{label}</label>
-      <div className="flex items-center gap-2">
+      <label className="text-xs sm:text-sm font-medium text-muted-foreground ml-1 truncate">{label}</label>
+      <div className="flex items-center gap-1 sm:gap-2">
         <Button
           variant="outline"
           size="icon"
           onClick={handleDecrement}
           disabled={value <= min}
-          className="h-14 w-14 rounded-xl shrink-0 border-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+          className="h-10 sm:h-14 w-10 sm:w-14 rounded-xl shrink-0 border-2 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
         >
-          <Minus className="h-5 w-5" />
+          <Minus className="h-4 sm:h-5 w-4 sm:w-5" />
         </Button>
         
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Input
             type="number"
             value={value}
             onChange={handleChange}
-            className="text-center text-xl font-display font-semibold h-14 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary rounded-xl"
+            className="text-center text-base sm:text-xl font-display font-semibold h-10 sm:h-14 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary rounded-xl text-ellipsis"
           />
           {suffix && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none">
+            <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none text-xs sm:text-sm">
               {suffix}
             </span>
           )}
@@ -72,9 +72,9 @@ export function StepperInput({
           size="icon"
           onClick={handleIncrement}
           disabled={value >= max}
-          className="h-14 w-14 rounded-xl shrink-0 border-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+          className="h-10 sm:h-14 w-10 sm:w-14 rounded-xl shrink-0 border-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-4 sm:h-5 w-4 sm:w-5" />
         </Button>
       </div>
     </div>

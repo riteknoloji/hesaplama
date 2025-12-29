@@ -14,8 +14,6 @@ export function CurrencyInput({ value, onChange, label }: CurrencyInputProps) {
   const [textRepresentation, setTextRepresentation] = useState("");
 
   useEffect(() => {
-    setDisplayValue(value);
-    
     // Calculate text representation
     const rawValue = parseValue(value);
     if (rawValue > 0) {
@@ -44,20 +42,18 @@ export function CurrencyInput({ value, onChange, label }: CurrencyInputProps) {
       if (parts[1].length > 2) return;
     }
 
-    // Format thousands with dots (only for display logic while typing is complex, 
-    // simpler approach is to strip and reformat on blur, but let's try real-time)
+    // Real-time formatting: add dots for thousands
+    let formatted = val;
+    if (val.includes(",")) {
+      const [intPart, decPart] = val.split(",");
+      const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      formatted = formattedInt + "," + decPart;
+    } else {
+      formatted = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
     
-    // For this implementation, we pass the raw string up, parent handles logic or we handle strict masking.
-    // Given the prompt requirements: "Automatically formats with dots for thousands"
-    
-    const rawVal = val.replace(/\./g, ""); // Remove dots to get clean number string
-    
-    // Logic to re-add dots:
-    // This is complex to do perfectly while typing cursor position is maintained.
-    // We will do a simple version: remove non-numeric chars (except comma), pass to parent.
-    // Parent formats it back.
-    
-    onChange(val, parseValue(val));
+    setDisplayValue(formatted);
+    onChange(formatted, parseValue(formatted));
   };
 
   const handleBlur = () => {
