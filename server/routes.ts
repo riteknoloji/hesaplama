@@ -8,9 +8,6 @@ interface ExchangeRate {
   code: string;
   name: string;
   rate: number;
-  previousRate?: number;
-  change?: number;
-  changePercent?: number;
 }
 
 const CURRENCIES = [
@@ -25,75 +22,42 @@ async function fetchCurrencyRates(): Promise<ExchangeRate[]> {
   const rates: ExchangeRate[] = [];
 
   try {
-    // Attempt to fetch from exchangerate-api.com
-    const response = await fetch("https://api.exchangerate-api.com/v4/latest/TRY", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    });
+    const response = await fetch("https://api.exchangerate-api.com/v4/latest/TRY");
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Real exchange rates fetched successfully");
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}`);
+    }
 
-      if (data?.rates) {
-        // Generate slight random changes for demo purposes
-        const baseRates = {
-          USD: data.rates.USD || 34.5,
-          EUR: data.rates.EUR || 36.2,
-          GBP: data.rates.GBP || 42.1,
-          JPY: data.rates.JPY || 0.24,
-          CHF: data.rates.CHF || 38.5,
-        };
+    const data = await response.json();
+    console.log("Real exchange rates fetched from exchangerate-api.com");
 
-        for (const currency of CURRENCIES) {
-          const rate = baseRates[currency.code as keyof typeof baseRates];
-          const change = (Math.random() - 0.5) * 0.5; // Random change between -0.25 and +0.25
-          const previousRate = rate - change;
-          const changePercent = previousRate > 0 ? (change / previousRate) * 100 : 0;
+    if (!data?.rates) {
+      throw new Error("No rates data in response");
+    }
 
-          rates.push({
-            code: currency.code,
-            name: currency.name,
-            rate: rate,
-            previousRate: previousRate,
-            change: change,
-            changePercent: changePercent,
-          });
-        }
-        return rates;
+    // Convert rates: API gives TRY to currency, we need currency to TRY (invert)
+    for (const currency of CURRENCIES) {
+      const tryToForeign = data.rates[currency.code];
+      if (tryToForeign && tryToForeign > 0) {
+        const foreignToTry = 1 / tryToForeign; // Invert to get currency to TRY
+        rates.push({
+          code: currency.code,
+          name: currency.name,
+          rate: foreignToTry,
+        });
+        console.log(`✓ ${currency.code}: ${foreignToTry.toFixed(2)} TRY`);
       }
     }
+
+    if (rates.length === 0) {
+      throw new Error("No valid rates extracted");
+    }
+
+    return rates;
   } catch (error) {
-    console.error("Error fetching real rates:", error);
+    console.error("Failed to fetch currency rates:", error);
+    throw error; // Re-throw to show error to client
   }
-
-  // Fallback to demo data with realistic Turkish Lira rates
-  const demoRates = {
-    USD: { rate: 34.52, prev: 34.48 },
-    EUR: { rate: 36.25, prev: 36.18 },
-    GBP: { rate: 42.15, prev: 42.08 },
-    JPY: { rate: 0.238, prev: 0.239 },
-    CHF: { rate: 38.65, prev: 38.58 },
-  };
-
-  for (const currency of CURRENCIES) {
-    const demo = demoRates[currency.code as keyof typeof demoRates];
-    const change = demo.rate - demo.prev;
-    const changePercent = (change / demo.prev) * 100;
-
-    rates.push({
-      code: currency.code,
-      name: currency.name,
-      rate: demo.rate,
-      previousRate: demo.prev,
-      change: change,
-      changePercent: changePercent,
-    });
-  }
-
-  console.log(`Returning ${rates.length} demo rates`);
-  return rates;
 }
 
 export async function registerRoutes(
@@ -121,14 +85,17 @@ export async function registerRoutes(
     res.json(list);
   });
 
-  // Currency rates endpoint
+  // Currency rates endpoint - REAL DATA ONLY
   app.get("/api/currency-rates", async (req, res) => {
     try {
       const rates = await fetchCurrencyRates();
       res.json(rates);
     } catch (error) {
-      console.error("Error fetching currency rates:", error);
-      res.status(500).json({ error: "Failed to fetch currency rates" });
+      console.error("Error in /api/currency-rates:", error);
+      res.status(500).json({ 
+        error: "Kurlar yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+        message: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
