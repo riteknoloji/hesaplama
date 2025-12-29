@@ -83,22 +83,24 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 -mt-16 relative z-20">
+      <div className="max-w-md mx-auto px-3 sm:px-4 -mt-16 relative z-20">
         <Tabs defaultValue="calculator" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 p-1 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90 rounded-2xl shadow-lg border border-white/20 h-14 mb-6">
+          <TabsList className="grid w-full grid-cols-2 p-1 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90 rounded-2xl shadow-lg border border-white/20 h-12 sm:h-14 mb-4 sm:mb-6">
             <TabsTrigger 
               value="calculator" 
-              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground font-semibold transition-all duration-300"
+              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground font-semibold transition-all duration-300 text-xs sm:text-sm"
             >
-              <Calculator className="w-4 h-4 mr-2" />
-              Hesaplama
+              <Calculator className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Hesaplama</span>
+              <span className="sm:hidden">Hesap</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rates" 
-              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground font-semibold transition-all duration-300"
+              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground font-semibold transition-all duration-300 text-xs sm:text-sm"
             >
-              <Coins className="w-4 h-4 mr-2" />
-              Kurlar
+              <Coins className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Kurlar</span>
+              <span className="sm:hidden">Kur</span>
             </TabsTrigger>
           </TabsList>
 
@@ -109,10 +111,10 @@ export default function Home() {
               transition={{ duration: 0.4 }}
             >
               <Card className="border-none shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl overflow-hidden">
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="p-3 sm:p-5 space-y-3 sm:space-y-4">
                   
                   {/* Inputs Section */}
-                  <div className="space-y-6">
+                  <div className="space-y-3 sm:space-y-4">
                     <CurrencyInput
                       label="Başlangıç Tutarı"
                       value={startAmountStr}
@@ -122,7 +124,7 @@ export default function Home() {
                       }}
                     />
 
-                    <div className="grid grid-cols-2 gap-3 lg:gap-6">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       <StepperInput
                         label="Günlük Yüzde (%)"
                         value={dailyPercent}
@@ -147,29 +149,30 @@ export default function Home() {
                   <div className="h-px bg-border/50 my-2" />
 
                   {/* Results Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-display font-bold text-foreground flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-primary" />
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex items-center justify-between mb-1 sm:mb-2">
+                      <h3 className="text-sm sm:text-base font-display font-bold text-foreground flex items-center gap-1 sm:gap-2">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                         Sonuçlar
                       </h3>
                       <button 
                         onClick={handleSaveCalculation}
-                        className="text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full"
+                        className="text-xs font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full"
                       >
                         <History className="w-3 h-3" />
-                        Kaydet
+                        <span className="hidden sm:inline">Kaydet</span>
+                        <span className="sm:hidden">Kaydet</span>
                       </button>
                     </div>
 
                     <ResultCard 
                       label="Genel Toplam" 
                       value={result.totalResult} 
-                      colorClass="text-foreground text-3xl"
+                      colorClass="text-foreground"
                       delay={0.1}
                     />
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       <ResultCard 
                         label="Toplam Kâr" 
                         value={result.totalProfit} 

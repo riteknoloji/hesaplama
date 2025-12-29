@@ -67,8 +67,8 @@ export function CurrencyInput({ value, onChange, label }: CurrencyInputProps) {
   };
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-muted-foreground ml-1">{label}</label>
+    <div className="space-y-1.5">
+      <label className="text-xs sm:text-sm font-medium text-muted-foreground ml-1">{label}</label>
       <div className="relative group">
         <Input
           type="text"
@@ -76,10 +76,10 @@ export function CurrencyInput({ value, onChange, label }: CurrencyInputProps) {
           value={displayValue}
           onChange={handleChange}
           onBlur={handleBlur}
-          className="text-2xl font-display font-semibold tracking-tight h-14 px-4 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all rounded-xl shadow-sm"
+          className="text-base sm:text-xl font-display font-semibold tracking-tight h-10 sm:h-12 px-3 sm:px-4 bg-white/50 dark:bg-black/20 border-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all rounded-xl shadow-sm"
           placeholder="0,00"
         />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none">
+        <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium pointer-events-none text-sm sm:text-base">
           ₺
         </div>
       </div>
@@ -89,7 +89,7 @@ export function CurrencyInput({ value, onChange, label }: CurrencyInputProps) {
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="text-xs font-medium text-primary ml-1 italic"
+            className="text-xs font-medium text-primary ml-1 italic line-clamp-1"
           >
             {textRepresentation}
           </motion.p>
