@@ -124,7 +124,7 @@ export default function Home() {
                       }}
                     />
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
                       <StepperInput
                         label="Günlük Yüzde (%)"
                         value={dailyPercent}
