@@ -9,21 +9,29 @@ interface CurrencyConverterProps {
   rates: ExchangeRate[];
   amount: number;
   onAmountChange: (amount: number) => void;
+  onCurrencyChange?: (currency: string) => void;
 }
 
-export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyConverterProps) {
+export function CurrencyConverter({ rates, amount, onAmountChange, onCurrencyChange }: CurrencyConverterProps) {
   const [amountStr, setAmountStr] = useState<string>(String(amount));
   const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
   const [result, setResult] = useState<number>(0);
   const [useType, setUseType] = useState<"buy" | "sell">("sell");
+  const [conversionMode, setConversionMode] = useState<"tlToFx" | "fxToTl">("tlToFx");
 
   useEffect(() => {
     setAmountStr(String(amount));
   }, [amount]);
 
   useEffect(() => {
+    if (onCurrencyChange) {
+      onCurrencyChange(selectedCurrency);
+    }
+  }, [selectedCurrency, onCurrencyChange]);
+
+  useEffect(() => {
     calculateConversion();
-  }, [amountStr, selectedCurrency, useType, rates]);
+  }, [amountStr, selectedCurrency, useType, rates, conversionMode]);
 
   const calculateConversion = () => {
     const numAmount = parseFloat(amountStr);
@@ -38,11 +46,19 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
       return;
     }
 
-    // TL'den dövize çeviriyoruz
-    // Kullanıcı döviz satıyorsa bankadan alış kuru, alıyorsa satış kuru
-    const appliedRate = useType === "buy" ? rate.sellRate : rate.buyRate;
-    // TL'yi dövize çevir
-    setResult((appliedRate ?? 0) > 0 ? numAmount / (appliedRate ?? 1) : 0);
+    if (conversionMode === "tlToFx") {
+      // TL'den dövize çeviriyoruz
+      // Kullanıcı döviz satıyorsa bankadan alış kuru, alıyorsa satış kuru
+      const appliedRate = useType === "buy" ? rate.sellRate : rate.buyRate;
+      // TL'yi dövize çevir
+      setResult((appliedRate ?? 0) > 0 ? numAmount / (appliedRate ?? 1) : 0);
+    } else {
+      // Dövizden TL'ye çeviriyoruz
+      // Kullanıcı döviz satıyorsa bankadan alış kuru, alıyorsa satış kuru
+      const appliedRate = useType === "sell" ? rate.buyRate : rate.sellRate;
+      // Dövizi TL'ye çevir
+      setResult(numAmount * (appliedRate ?? 0));
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +68,12 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
     if (!isNaN(numValue)) {
       onAmountChange(numValue);
     }
+  };
+
+  const handleSwapMode = () => {
+    setConversionMode(conversionMode === "tlToFx" ? "fxToTl" : "tlToFx");
+    setAmountStr("0");
+    setResult(0);
   };
 
   return (
@@ -66,6 +88,19 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
       </h4>
 
       <div className="space-y-3">
+        {/* Çevirme Yönü Seçimi */}
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={handleSwapMode}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-all border border-primary/30"
+          >
+            <span className="text-xs sm:text-sm font-medium text-primary">
+              {conversionMode === "tlToFx" ? "TL → Döviz" : "Döviz → TL"}
+            </span>
+            <ArrowRightLeft className="w-4 h-4 text-primary" />
+          </button>
+        </div>
+
         {/* İşlem Tipi */}
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -76,7 +111,7 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
                 : "bg-white/50 dark:bg-slate-800/50 text-muted-foreground hover:bg-white dark:hover:bg-slate-800"
             }`}
           >
-            Elinizdeki Dövizi Satın
+            {conversionMode === "tlToFx" ? "Elinizdeki Dövizi Satın" : "Döviz Satıyorum"}
           </button>
           <button
             onClick={() => setUseType("buy")}
@@ -86,20 +121,22 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
                 : "bg-white/50 dark:bg-slate-800/50 text-muted-foreground hover:bg-white dark:hover:bg-slate-800"
             }`}
           >
-            Döviz Almak İstiyorum
+            {conversionMode === "tlToFx" ? "Döviz Almak İstiyorum" : "Döviz Alıyorum"}
           </button>
         </div>
 
         {/* Miktar ve Döviz Seçimi */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">TL Tutarı</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              {conversionMode === "tlToFx" ? "TL Tutarı" : `${selectedCurrency} Tutarı`}
+            </label>
             <Input
               type="text"
               inputMode="decimal"
               value={amountStr}
               onChange={handleAmountChange}
-              placeholder="5000"
+              placeholder="0"
               className="text-base font-semibold"
             />
           </div>
@@ -124,7 +161,9 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
         {/* Sonuç */}
         <div className="pt-3 border-t border-border/50">
           <div className="flex items-center justify-between">
-            <span className="text-xs sm:text-sm text-muted-foreground">Karşılık ({selectedCurrency})</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">
+              Karşılık ({conversionMode === "tlToFx" ? selectedCurrency : "TL"})
+            </span>
             <motion.div
               key={result}
               initial={{ scale: 0.95 }}
@@ -135,7 +174,7 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{" "}
-              {selectedCurrency}
+              {conversionMode === "tlToFx" ? selectedCurrency : "₺"}
             </motion.div>
           </div>
           
@@ -143,10 +182,16 @@ export function CurrencyConverter({ rates, amount, onAmountChange }: CurrencyCon
           {rates.find((r) => r.code === selectedCurrency) && (
             <div className="mt-2 text-xs text-muted-foreground text-right">
               Kur: 1 {selectedCurrency} ={" "}
-              {(useType === "buy"
-                ? rates.find((r) => r.code === selectedCurrency)?.sellRate
-                : rates.find((r) => r.code === selectedCurrency)?.buyRate
-              )?.toFixed(4)}{" "}
+              {conversionMode === "tlToFx" 
+                ? (useType === "buy"
+                    ? rates.find((r) => r.code === selectedCurrency)?.sellRate
+                    : rates.find((r) => r.code === selectedCurrency)?.buyRate
+                  )?.toFixed(4)
+                : (useType === "sell"
+                    ? rates.find((r) => r.code === selectedCurrency)?.buyRate
+                    : rates.find((r) => r.code === selectedCurrency)?.sellRate
+                  )?.toFixed(4)
+              }{" "}
               ₺
             </div>
           )}

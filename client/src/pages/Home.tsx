@@ -11,10 +11,10 @@ import { useCreateCalculation } from "@/hooks/use-calculations";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
-  const [startAmountStr, setStartAmountStr] = useState("10.000,00");
-  const [startAmount, setStartAmount] = useState(10000);
-  const [dailyPercent, setDailyPercent] = useState(5);
-  const [days, setDays] = useState(30);
+  const [startAmountStr, setStartAmountStr] = useState("0,00");
+  const [startAmount, setStartAmount] = useState(0);
+  const [dailyPercent, setDailyPercent] = useState(0);
+  const [days, setDays] = useState(0);
   
   const [result, setResult] = useState({
     totalResult: 0,

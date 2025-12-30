@@ -10,7 +10,8 @@ export function CurrencyRatesTab() {
   const { data: rates, isLoading, error, refetch, isRefetching } = useCurrencyRates();
   const { toast } = useToast();
   const [isRefreshDisabled, setIsRefreshDisabled] = useState(false);
-  const [conversionAmount, setConversionAmount] = useState<number>(5000);
+  const [conversionAmount, setConversionAmount] = useState<number>(0);
+  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = useState<string>("USD");
 
   const handleRefresh = async () => {
     if (isRefreshDisabled || isRefetching) return;
@@ -90,6 +91,7 @@ export function CurrencyRatesTab() {
           rates={rates} 
           amount={conversionAmount}
           onAmountChange={setConversionAmount}
+          onCurrencyChange={setSelectedDisplayCurrency}
         />
       )}
 
@@ -121,15 +123,26 @@ export function CurrencyRatesTab() {
                   </div>
                 </div>
                 
-                {/* Miktar Input - TL */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={conversionAmount}
-                    onChange={(e) => setConversionAmount(Number(e.target.value) || 0)}
-                    className="w-20 sm:w-24 px-2 py-1 text-sm font-semibold text-center rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                  <span className="text-xs font-medium text-muted-foreground">TL</span>
+                {/* Seçili Döviz Cinsinden Karşılık */}
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground mb-1">Karşılık</p>
+                  <p className="text-sm sm:text-base font-bold text-primary">
+                    {(() => {
+                      if (rate.code === selectedDisplayCurrency) {
+                        return conversionAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      }
+                      const selectedRate = rates?.find(r => r.code === selectedDisplayCurrency);
+                      if (!selectedRate || !rate.buyRate || !selectedRate.buyRate) return "0,00";
+                      
+                      // Önce TL'ye çevir, sonra hedef dövize
+                      const inTL = conversionAmount;
+                      const inSourceFx = inTL / rate.buyRate;
+                      const inTargetFx = inSourceFx * (rate.buyRate / selectedRate.buyRate);
+                      
+                      return inTargetFx.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    })()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{selectedDisplayCurrency}</p>
                 </div>
               </div>
 
@@ -154,7 +167,17 @@ export function CurrencyRatesTab() {
                   </motion.p>
                   {/* TL'nin Döviz Karşılığı */}
                   <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    = {((rate.buyRate ?? 0) > 0 ? (conversionAmount / (rate.buyRate ?? 1)) : 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {rate.code}
+                    {rate.code === selectedDisplayCurrency ? (
+                      <>= {((rate.buyRate ?? 0) > 0 ? (conversionAmount / (rate.buyRate ?? 1)) : 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {rate.code}</>
+                    ) : (
+                      <>= {(() => {
+                        const selectedRate = rates?.find(r => r.code === selectedDisplayCurrency);
+                        if (!selectedRate || !rate.buyRate || !selectedRate.buyRate) return "0,00";
+                        const inSourceFx = conversionAmount / rate.buyRate;
+                        const inTargetFx = inSourceFx * (rate.buyRate / selectedRate.buyRate);
+                        return inTargetFx.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      })()} {selectedDisplayCurrency}</>
+                    )}
                   </p>
                   <motion.div
                     initial={false}
@@ -209,7 +232,17 @@ export function CurrencyRatesTab() {
                   </motion.p>
                   {/* TL'nin Döviz Karşılığı */}
                   <p className="text-xs font-semibold text-red-600 dark:text-red-400">
-                    = {((rate.sellRate ?? 0) > 0 ? (conversionAmount / (rate.sellRate ?? 1)) : 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {rate.code}
+                    {rate.code === selectedDisplayCurrency ? (
+                      <>= {((rate.sellRate ?? 0) > 0 ? (conversionAmount / (rate.sellRate ?? 1)) : 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {rate.code}</>
+                    ) : (
+                      <>= {(() => {
+                        const selectedRate = rates?.find(r => r.code === selectedDisplayCurrency);
+                        if (!selectedRate || !rate.sellRate || !selectedRate.sellRate) return "0,00";
+                        const inSourceFx = conversionAmount / rate.sellRate;
+                        const inTargetFx = inSourceFx * (rate.sellRate / selectedRate.sellRate);
+                        return inTargetFx.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      })()} {selectedDisplayCurrency}</>
+                    )}
                   </p>
                   <motion.div
                     initial={false}
@@ -243,6 +276,52 @@ export function CurrencyRatesTab() {
                       <span className="text-xs">-</span>
                     )}
                   </motion.div>
+                </div>
+              </div>
+
+              {/* Alış-Satış Farkı */}
+              <div className="mt-3 p-2 sm:p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-border/50">
+                <p className="text-xs text-muted-foreground font-medium mb-1.5">Alış-Satış Farkı</p>
+                <div className="space-y-1">
+                  {(() => {
+                    const diffTL = (rate.sellRate ?? 0) - (rate.buyRate ?? 0);
+                    const diffCurrency = conversionAmount > 0 && (rate.sellRate ?? 0) > 0 && (rate.buyRate ?? 0) > 0
+                      ? (conversionAmount / (rate.buyRate ?? 1)) - (conversionAmount / (rate.sellRate ?? 1))
+                      : 0;
+                    const isLoss = diffTL < 0;
+                    const statusText = isLoss ? "Zarar" : diffTL > 0 ? "Fark" : "Eşit";
+                    
+                    return (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">TL Farkı:</span>
+                          <span className={`text-sm font-bold ${
+                            isLoss 
+                              ? "text-red-600 dark:text-red-400" 
+                              : diffTL > 0 
+                              ? "text-amber-600 dark:text-amber-400" 
+                              : "text-gray-600 dark:text-gray-400"
+                          }`}>
+                            {diffTL >= 0 ? "+" : ""}{diffTL.toFixed(4)} ₺ {statusText}
+                          </span>
+                        </div>
+                        {conversionAmount > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">{rate.code} Farkı:</span>
+                            <span className={`text-sm font-bold ${
+                              isLoss 
+                                ? "text-red-600 dark:text-red-400" 
+                                : diffTL > 0 
+                                ? "text-amber-600 dark:text-amber-400" 
+                                : "text-gray-600 dark:text-gray-400"
+                            }`}>
+                              {diffCurrency >= 0 ? "+" : ""}{diffCurrency.toFixed(2)} {rate.code} {statusText}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
