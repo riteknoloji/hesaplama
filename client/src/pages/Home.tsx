@@ -116,34 +116,45 @@ export default function Home() {
                   
                   {/* Inputs Section */}
                   <div className="space-y-3 sm:space-y-4">
-                    <CurrencyInput
-                      label="Başlangıç Tutarı"
-                      value={startAmountStr}
-                      onChange={(val, raw) => {
-                        setStartAmountStr(val);
-                        setStartAmount(raw);
-                      }}
-                    />
+                    <div className="flex justify-center">
+                      <div className="w-full sm:w-auto">
+                        <CurrencyInput
+                          label="Başlangıç Tutarı"
+                          value={startAmountStr}
+                          onChange={(val, raw) => {
+                            setStartAmountStr(val);
+                            setStartAmount(raw);
+                          }}
+                        />
+                      </div>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
-                      <StepperInput
-                        label="Günlük Yüzde (%)"
-                        value={dailyPercent}
-                        onChange={setDailyPercent}
-                        min={0.1}
-                        max={100}
-                        step={0.5}
-                        suffix="%"
-                      />
-                      <StepperInput
-                        label="Gün Sayısı"
-                        value={days}
-                        onChange={setDays}
-                        min={1}
-                        max={365}
-                        step={1}
-                        suffix="Gün"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex justify-center">
+                        <div className="w-full sm:w-56">
+                          <StepperInput
+                            value={dailyPercent}
+                            onChange={(v) => setDailyPercent(v)}
+                            label="Günlük Yüzde"
+                            step={0.1}
+                            min={0}
+                            max={100}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center">
+                        <div className="w-full sm:w-56">
+                          <StepperInput
+                            value={days}
+                            onChange={(v) => setDays(v)}
+                            label="Gün Sayısı"
+                            step={1}
+                            min={1}
+                            max={365}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -186,6 +197,7 @@ export default function Home() {
                         isCurrency={false}
                         colorClass="text-blue-600 dark:text-blue-400"
                         delay={0.3}
+                        meta={`${days} gün`}
                       />
                     </div>
                   </div>

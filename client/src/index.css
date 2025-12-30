@@ -88,6 +88,38 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20;
   }
+
+  /* Force visible input text for tricky browser/theme combos */
+  .force-input {
+    color: rgb(var(--foreground)) !important;
+    -webkit-text-fill-color: rgb(var(--foreground)) !important;
+    opacity: 1 !important;
+  }
+  /* Explicit fallback colors to ensure visibility across browsers */
+  :root .force-input {
+    color: rgba(0,0,0,0.95) !important;
+    -webkit-text-fill-color: rgba(0,0,0,0.95) !important;
+  }
+  .dark .force-input {
+    color: rgba(255,255,255,0.95) !important;
+    -webkit-text-fill-color: rgba(255,255,255,0.95) !important;
+  }
+  /* Stronger selectors to override browser/autofill and theme styles */
+  input.force-input, textarea.force-input {
+    color: rgb(var(--foreground)) !important;
+    -webkit-text-fill-color: rgb(var(--foreground)) !important;
+    caret-color: rgb(var(--foreground)) !important;
+    opacity: 1 !important;
+  }
+  input.force-input::placeholder, textarea.force-input::placeholder {
+    color: rgba(127,127,127,0.6) !important;
+  }
+  /* Chrome/Edge autofill */
+  input.force-input:-webkit-autofill, input.force-input:-internal-autofill-selected {
+    -webkit-text-fill-color: rgb(var(--foreground)) !important;
+    box-shadow: 0 0 0px 1000px transparent inset !important;
+  }
+  /* Temporary debug helper: removed once issue resolved */
 }
 
 /* Remove spin buttons from number inputs */
